@@ -1,0 +1,85 @@
+{
+  "module_name": "wikipedia streams",
+  "module_type": "web_analytics",
+  "USER_INPUT_JSON": {
+    "capability": {
+      "ds_config_validation_mode": "AUTO",
+      "preview_enabled": false,
+      "minimum_schedule_frequency": 0,
+      "config_validation_required": true,
+      "schedule_type": "MOMENT"
+    },
+    "fields": {
+      "search": {
+        "long_desc": "",
+        "server_auto_suggest": false,
+        "dependent_on": false,
+        "key": "search",
+        "placeholder": "Enter the Search term",
+        "default_value": "",
+        "server_validate": false,
+        "pattern": null,
+        "required": true,
+        "short_desc": "",
+        "label": "search",
+        "type": "PARAGRAPH_TEXT"
+      },
+      "count": {
+        "long_desc": "",
+        "server_auto_suggest": false,
+        "dependent_on": false,
+        "key": "count",
+        "placeholder": "Enter the Number of records to be searched for the above mentioned search term",
+        "default_value": "1",
+        "server_validate": false,
+        "pattern": null,
+        "required": true,
+        "short_desc": "",
+        "label": "count",
+        "type": "PARAGRAPH_TEXT"
+      }
+    },
+    "ux": {
+      "attributes": {
+        "search": {
+          "onChange": "",
+          "rows": 1
+        },
+        "count": {
+          "onChange": "",
+          "rows": 1
+        }
+      },
+      "edit_layout": [],
+      "layout": [
+        {
+          "type": "row",
+          "items": [
+            {
+              "width": {
+                "value": "100",
+                "unit": "%"
+              },
+              "classes": "",
+              "type": "field",
+              "key": "search"
+            },
+            {
+              "width": {
+                "value": "100",
+                "unit": "%"
+              },
+              "classes": "",
+              "type": "field",
+              "key": "count"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "AUTH": {
+    "type": "NO_AUTH"
+  },
+  "module_code": "wikipedia_streams"
+}
