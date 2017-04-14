@@ -5,6 +5,7 @@ import unicodecsv as csv
 import sseclient
 import requests
 import sdk.const as sdkconst
+
 from threep.base import DataYielder
 
 log = logging
@@ -62,23 +63,17 @@ class wikipedia_streamsDataYielder(DataYielder):
         new_count = 0
         search = self.ds_config['search']
         count = int(self.ds_config['count'])
-        # define the constant value added to the count in the const.py
-        max_count = count + 10
+        max_count = count + const.CONFIG_FIELDS.COUNT_INCREMENT
         response = get_wikipedia_streams_data()
-        # field_names has to be added in the const.py
-        field_names = [u'comment', u'wiki', u'server_name', u'server_script_path', u'namespace', u'title', u'bot',
-                       u'server_url', u'length', u'meta', u'user', u'timestamp', u'type', u'id', u'minor', u'revision',
-                       u'patrolled', u'log_id', u'log_params', u'log_type', u'log_action', u'log_action_comment']
+        field_names = const.FIELDS_NAME
         with open(file_path, 'w') as outfile:
             writer = csv.DictWriter(outfile, fieldnames=field_names)
-            # import pdb
-            # pdb.set_trace()
             idx = max_count
             if search != "":
                 for event in response.events():
                     change = json.loads(event.data)
                     change = extract_predefined_dict(change, field_names)
-                    if change[u'wiki'] == search and new_count <= count:
+                    if change[u'title'] == search and new_count <= count:
                         try:
                             writer.writerow(change)
                             new_count += 1
@@ -88,19 +83,6 @@ class wikipedia_streamsDataYielder(DataYielder):
                     elif new_count > count or idx == 0:
                             break
                     idx = idx - 1
-            # else:
-            #     for event in response.events():
-            #         change = json.loads(event.data)
-            #         change = extract_predefined_dict(change, field_names)
-            #         if new_count <= count:
-            #             try:
-            #                 writer.writerow(change)
-            #                 new_count += 1
-            #             except Exception as e:
-            #                 logging.info(e)
-            #                 raise e
-            #         else:
-            #             continue
         return {}
 
     def _setup(self):
@@ -137,16 +119,119 @@ class wikipedia_streamsDataYielder(DataYielder):
             {
                 'internal_name': 'column_0',
                 'display_name': 'comment',
-                'type': 'TEXT'
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_1',
+                'display_name': 'wiki',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_2',
+                'display_name': 'server_name',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_3',
+                'display_name': 'server_script_path',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_4',
+                'display_name': 'namespace',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_5',
+                'display_name': 'title',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_6',
+                'display_name': 'bot',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_7',
+                'display_name': 'server_url',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_8',
+                'display_name': 'length',
+                'type': sdkconst.DATA_TYPES.NUMERIC
+            },
+            {
+                'internal_name': 'column_9',
+                'display_name': 'meta',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_10',
+                'display_name': 'user',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_11',
+                'display_name': 'timestamp',
+                'type': sdkconst.DEFAULT_DATETIME_FORMAT
+            },
+            {
+                'internal_name': 'column_12',
+                'display_name': 'type',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_13',
+                'display_name': 'id',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_14',
+                'display_name': 'minor',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_15',
+                'display_name': 'revision',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_16',
+                'display_name': 'patrolled',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_17',
+                'display_name': 'log_id',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_18',
+                'display_name': 'log_params',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_19',
+                'display_name': 'log_type',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_20',
+                'display_name': 'log_action',
+                'type': sdkconst.DATA_TYPES.TEXT
+            },
+            {
+                'internal_name': 'column_21',
+                'display_name': 'log_action_comment',
+                'type': sdkconst.DATA_TYPES.TEXT
             }
         ]
 
-        return {}
+        return metadata
 
 
 def extract_predefined_dict(data, fields):
-    # import pdb
-    # pdb.set_trace()
     unwanted = set(fields) - set(data)
     if len(unwanted) != 0:
         for unwanted_key in unwanted:
