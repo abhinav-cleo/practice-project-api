@@ -25,7 +25,7 @@ def with_requests(url):
 
 
 def get_wikipedia_streams_data():
-    url = 'https://stream.wikimedia.org/v2/stream/recentchange'
+    url = const.STREAM_URL
     response = with_urllib3(url)  # or with_requests(url)
     parsed = sseclient.SSEClient(response)
     return parsed
@@ -61,26 +61,27 @@ class wikipedia_streamsDataYielder(DataYielder):
             TODO: return dict format to be standardized
         """
         new_count = 0
-        search = self.ds_config['search']
-        count = int(self.ds_config['count'])
-        max_count = count + const.CONFIG_FIELDS.COUNT_INCREMENT
+        search = self.ds_config[const.CONFIG_FIELDS.SEARCH]
+        count = int(self.ds_config[const.CONFIG_FIELDS.COUNT])
+        max_count = count + const.MAX_LIMIT
         response = get_wikipedia_streams_data()
-        field_names = const.FIELDS_NAME
+        field_names = const.FIELDS_NAMES
         with open(file_path, 'w') as outfile:
             writer = csv.DictWriter(outfile, fieldnames=field_names)
             idx = max_count
             if search != "":
                 for event in response.events():
                     change = json.loads(event.data)
-                    change = extract_predefined_dict(change, field_names)
-                    if change[u'title'] == search and new_count <= count:
+                    change = extract_predefined_dict(change)
+                    change[sdkconst.KEYWORDS.BATCH_ID] = self.batchId
+                    if change[u'title'].lower().find(search.lower()) != -1 and new_count < count:
                         try:
                             writer.writerow(change)
                             new_count += 1
                         except Exception as e:
                             logging.info(e)
                             raise e
-                    elif new_count > count or idx == 0:
+                    elif new_count >= count or idx == 0:
                             break
                     idx = idx - 1
         return {}
@@ -159,7 +160,7 @@ class wikipedia_streamsDataYielder(DataYielder):
             {
                 'internal_name': 'column_8',
                 'display_name': 'length',
-                'type': sdkconst.DATA_TYPES.NUMERIC
+                'type': sdkconst.DATA_TYPES.TEXT
             },
             {
                 'internal_name': 'column_9',
@@ -174,7 +175,7 @@ class wikipedia_streamsDataYielder(DataYielder):
             {
                 'internal_name': 'column_11',
                 'display_name': 'timestamp',
-                'type': sdkconst.DATA_TYPES.DATE
+                'type': sdkconst.DATA_TYPES.TEXT
             },
             {
                 'internal_name': 'column_12',
@@ -184,7 +185,7 @@ class wikipedia_streamsDataYielder(DataYielder):
             {
                 'internal_name': 'column_13',
                 'display_name': 'id',
-                'type': sdkconst.DATA_TYPES.TEXT
+                'type': sdkconst.DATA_TYPES.NUMERIC
             },
             {
                 'internal_name': 'column_14',
@@ -231,8 +232,8 @@ class wikipedia_streamsDataYielder(DataYielder):
         return metadata
 
 
-def extract_predefined_dict(data, fields):
-    unwanted = set(fields) - set(data)
+def extract_predefined_dict(data):
+    unwanted = set(data) - set(const.FIELDS_NAMES)
     if len(unwanted) != 0:
         for unwanted_key in unwanted:
             if unwanted_key in data:
