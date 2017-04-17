@@ -174,7 +174,7 @@ class wikipedia_streamsDataYielder(DataYielder):
             {
                 'internal_name': 'column_11',
                 'display_name': 'timestamp',
-                'type': sdkconst.DEFAULT_DATETIME_FORMAT
+                'type': sdkconst.DATA_TYPES.DATE
             },
             {
                 'internal_name': 'column_12',
